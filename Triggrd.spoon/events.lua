@@ -1,4 +1,4 @@
-local Triggerspoon = ...;
+local Triggrd = ...;
 
 -- the shittiest enum in existence
 local appEvents = {
@@ -11,8 +11,8 @@ local appEvents = {
     [hs.application.watcher.unhidden] = "unhidden"
 }
 
-Triggerspoon.appWatcher = hs.application.watcher.new(function(name, type, app)
-    Triggerspoon:handleEvent({
+Triggrd.appWatcher = hs.application.watcher.new(function(name, type, app)
+    Triggrd:handleEvent({
         tags = {"app", appEvents[type], name},
         data = {
             app = app,
@@ -20,7 +20,7 @@ Triggerspoon.appWatcher = hs.application.watcher.new(function(name, type, app)
         }
     })
 end)
-Triggerspoon.appWatcher:start()
+Triggrd.appWatcher:start()
 
 local caffEvents = {
     [hs.caffeinate.watcher.screensaverDidStart] = "screensaverDidStart",
@@ -37,29 +37,29 @@ local caffEvents = {
     [hs.caffeinate.watcher.systemWillSleep] = "systemWillSleep"
 }
 
-Triggerspoon.caffWatcher = hs.caffeinate.watcher.new(function(type)
-    Triggerspoon:handleEvent({
+Triggrd.caffWatcher = hs.caffeinate.watcher.new(function(type)
+    Triggrd:handleEvent({
         tags = {"caff", caffEvents[type]},
         data = {
             textArgs = {caffEvents[type]}
         }
     })
 end)
-Triggerspoon.caffWatcher:start()
+Triggrd.caffWatcher:start()
 
-Triggerspoon.usbWatcher = hs.usb.watcher.new(function(usbInfo)
-    Triggerspoon:handleEvent({
+Triggrd.usbWatcher = hs.usb.watcher.new(function(usbInfo)
+    Triggrd:handleEvent({
         tags = {"usb", usbInfo.eventType, usbInfo.productName},
         data = {
             eventInfo = usbInfo,
-            textArgs = {((usbInfo.eventType == "added") and "connected" or "disconnected"), usbInfo.productName}
+            textArgs = {usbInfo.productName, ((usbInfo.eventType == "added") and "connected" or "disconnected")}
         }
     })
 end)
-Triggerspoon.usbWatcher:start()
+Triggrd.usbWatcher:start()
 
-Triggerspoon.spacesWatcher = hs.spaces.watcher.new(function(spaceNumber)
-    Triggerspoon:handleEvent({
+Triggrd.spacesWatcher = hs.spaces.watcher.new(function(spaceNumber)
+    Triggrd:handleEvent({
         tags = {"spacechanged", "space" .. spaceNumber},
         data = {
             spaceNumber = spaceNumber,
@@ -67,10 +67,10 @@ Triggerspoon.spacesWatcher = hs.spaces.watcher.new(function(spaceNumber)
         }
     })
 end)
-Triggerspoon.spacesWatcher:start()
+Triggrd.spacesWatcher:start()
 
-Triggerspoon.pasteboardWatcher = hs.pasteboard.watcher.new(function(pasteboard)
-    Triggerspoon:handleEvent({
+Triggrd.pasteboardWatcher = hs.pasteboard.watcher.new(function(pasteboard)
+    Triggrd:handleEvent({
         tags = {"pasteboard", pasteboard},
         data = {
             contents = pasteboard,
@@ -78,7 +78,7 @@ Triggerspoon.pasteboardWatcher = hs.pasteboard.watcher.new(function(pasteboard)
         }
     })
 end)
-Triggerspoon.pasteboardWatcher:start()
+Triggrd.pasteboardWatcher:start()
 
 -- for some amount of filename convention
 local powerSourceFilenames = {
@@ -87,30 +87,30 @@ local powerSourceFilenames = {
     ["Off Line"] = "offline"
 }
 
-Triggerspoon.lastBatteryState = hs.battery.getAll()
+Triggrd.lastBatteryState = hs.battery.getAll()
 
-Triggerspoon.batteryWatcher = hs.battery.watcher.new(function()
+Triggrd.batteryWatcher = hs.battery.watcher.new(function()
     local batteryState = hs.battery.getAll()
-    if batteryState.isCharging ~= Triggerspoon.lastBatteryState.isCharging then
-        Triggerspoon:handleEvent({
+    if batteryState.isCharging ~= Triggrd.lastBatteryState.isCharging then
+        Triggrd:handleEvent({
             tags = {"battery", batteryState.isCharging and "charging" or "notCharging"},
             data = {
                 batteryState = batteryState
             }
         })
     end
-    if batteryState.percentage ~= Triggerspoon.lastBatteryState.percentage then
-        Triggerspoon:handleEvent({
+    if batteryState.percentage ~= Triggrd.lastBatteryState.percentage then
+        Triggrd:handleEvent({
             tags = {"battery", "level", tostring(batteryState.percentage) .. "percent",
-                    (batteryState.percentage > Triggerspoon.lastBatteryState.percentage) and "up" or "down"},
+                    (batteryState.percentage > Triggrd.lastBatteryState.percentage) and "up" or "down"},
             data = {
                 batteryState = batteryState,
                 textArgs = {tostring(batteryState.percentage)}
             }
         })
     end
-    if batteryState.powerSource ~= Triggerspoon.lastBatteryState.powerSource then
-        Triggerspoon:handleEvent({
+    if batteryState.powerSource ~= Triggrd.lastBatteryState.powerSource then
+        Triggrd:handleEvent({
             tags = {"power", powerSourceFilenames[batteryState.powerSource]},
             data = {
                 batteryState = batteryState,
@@ -118,13 +118,33 @@ Triggerspoon.batteryWatcher = hs.battery.watcher.new(function()
             }
         })
     end
-    Triggerspoon.lastBatteryState = batteryState
+    Triggrd.lastBatteryState = batteryState
 end)
-Triggerspoon.batteryWatcher:start()
+Triggrd.batteryWatcher:start()
 
-Triggerspoon.screenWatcher=hs.screen.watcher.newWithActiveScreen(function()
-Triggerspoon:handleEvent({
+Triggrd.screenWatcher=hs.screen.watcher.newWithActiveScreen(function()
+Triggrd:handleEvent({
     tags={"screenchanged"}
 })
 end)
-Triggerspoon.screenWatcher:start()
+Triggrd.screenWatcher:start()
+
+--I'm tired of these shitty enums, is there a better way to do this?
+local volumeEvents={
+[hs.fs.volume.didMount]="didMount",
+[hs.fs.volume.didRename]="didRename",
+[hs.fs.volume.didUnmount]="didUnmount",
+[hs.fs.volume.willUnmount]="willUnmount",
+}
+
+Triggrd.volumeWatcher=hs.fs.volume.new(function(eventType, volumeInfo)
+    Triggrd:handleEvent({
+        tags = {"volume", volumeEvents[eventType]},
+        data = {
+            volumeInfo = volumeInfo,
+            textArgs = {volumeInfo.NSURLVolumeNameKey}
+        }
+    })
+end)
+Triggrd.volumeWatcher:start()
+

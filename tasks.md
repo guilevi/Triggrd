@@ -13,12 +13,13 @@
 * USB events
 * hs.caffeinate related events
 * Space changed event
+* Volume events
 
 ## To Do
 
 * Handle osascript files
 * Handle automator workflows
-* Receive events from hs.urlevent
+* Receive events from hs.urlevent (maybe think about hs.httpserver because urlevent opens the HS console)
 * audiodevice events
 * Network events (requiring timer probably)
 * Wifi watcher events
