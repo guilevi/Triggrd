@@ -14,6 +14,7 @@
 * hs.caffeinate related events
 * Space changed event
 * Volume events
+* Migrate SoundNote soundpacks
 
 ## To Do
 

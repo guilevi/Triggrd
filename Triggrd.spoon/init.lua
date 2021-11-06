@@ -51,7 +51,7 @@ function Triggrd:start()
 
     Triggrd:registerAutomations(userAutomationsPath)
     Triggrd.tts = hs.speech.new()
-
+Triggrd:createMenubar()
     loadfile(hs.spoons.resourcePath("events.lua"))(Triggrd)
     Triggrd:setupHotkeys()
     logger.i("Triggrd is ready")
@@ -117,6 +117,27 @@ function Triggrd:registerAutomations(path)
             logger.i("Registered automation " .. fullPath)
         end
     end
+end
+
+function Triggrd:createMenubar()
+    Triggrd.menu = hs.menubar.new(true)
+    Triggrd.menu:setTitle("Triggrd")
+    local menuContents = {{
+        title = "Reload automations",
+        fn = function()
+            registeredAutomations = {}
+            Triggrd:registerAutomations(userAutomationsPath)
+            Triggrd:handleEvent({
+                tags = {"Triggrd", "reloaded"}
+            })
+        end
+    }, {
+        title = "Migrate SoundNote soundpack...",
+        fn=function()
+            loadfile(hs.spoons.resourcePath("snmigrate.lua"))(userAutomationsPath)
+        end
+    }}
+    Triggrd.menu:setMenu(menuContents)
 end
 
 function Triggrd:setupHotkeys()

@@ -14,6 +14,12 @@ spoon.Triggrd:start()
 ````
 1. There is a set of example event automations in the *My Example Triggrd Automations* directory in this repository. Copy or symlink it into your documents folder if you wish, making sure to remove the word "Example".
 
+### Migrating from SoundNote
+
+Triggrd includes a utility to migrate SoundNote soundpacks to the Triggrd format. To access it, click on the Triggrd menu on the menu bar and select "Migrate SoundNote soundpack..."
+
+Note for blind users: The Triggrd menu in menu extras is spoken as "Hammerspoon: Triggrd". There seems to be nothing I can do about that for now.
+
 ## Basic concepts
 
 * All of your automations will be in a path of your choosing. By default, this is `~/documents/My Triggrd Automations`. You can change this by modifying the `userAutomationsPath` variable in the spoon's `init.lua`.
