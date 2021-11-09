@@ -19,6 +19,7 @@ Triggrd.appWatcher = hs.application.watcher.new(function(name, type, app)
             textArgs = {name, appEvents[type]}
         }
     })
+    updateAppList(type, app)
 end)
 Triggrd.appWatcher:start()
 
@@ -122,22 +123,22 @@ Triggrd.batteryWatcher = hs.battery.watcher.new(function()
 end)
 Triggrd.batteryWatcher:start()
 
-Triggrd.screenWatcher=hs.screen.watcher.newWithActiveScreen(function()
-Triggrd:handleEvent({
-    tags={"screenchanged"}
-})
+Triggrd.screenWatcher = hs.screen.watcher.newWithActiveScreen(function()
+    Triggrd:handleEvent({
+        tags = {"screenchanged"}
+    })
 end)
 Triggrd.screenWatcher:start()
 
---I'm tired of these shitty enums, is there a better way to do this?
-local volumeEvents={
-[hs.fs.volume.didMount]="didMount",
-[hs.fs.volume.didRename]="didRename",
-[hs.fs.volume.didUnmount]="didUnmount",
-[hs.fs.volume.willUnmount]="willUnmount",
+-- I'm tired of these shitty enums, is there a better way to do this?
+local volumeEvents = {
+    [hs.fs.volume.didMount] = "didMount",
+    [hs.fs.volume.didRename] = "didRename",
+    [hs.fs.volume.didUnmount] = "didUnmount",
+    [hs.fs.volume.willUnmount] = "willUnmount"
 }
 
-Triggrd.volumeWatcher=hs.fs.volume.new(function(eventType, volumeInfo)
+Triggrd.volumeWatcher = hs.fs.volume.new(function(eventType, volumeInfo)
     Triggrd:handleEvent({
         tags = {"volume", volumeEvents[eventType]},
         data = {
@@ -148,3 +149,17 @@ Triggrd.volumeWatcher=hs.fs.volume.new(function(eventType, volumeInfo)
 end)
 Triggrd.volumeWatcher:start()
 
+function updateAppList(eventType, app)
+    if eventType == hs.application.watcher.launched then
+        for _, i in ipairs(Triggrd.runningApps) do
+            if i[1] == app then
+                return
+            end
+        end
+        table.insert(Triggrd.runningApps, Triggrd.generateAppListItem(Triggrd,app))
+    elseif eventType == hs.application.watcher.terminated then
+        Triggrd.runningApps = hs.fnutils.ifilter(Triggrd.runningApps, function(i)
+            return i[1] == app
+        end)
+    end
+end

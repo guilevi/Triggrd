@@ -15,7 +15,8 @@ local Triggrd = {
             return function(eventData)
                 local file = io.open(path)
                 local text = file:read("a")
-                eventData.Triggrd.tts:speak(string.format(text, (eventData.textArgs and table.unpack(eventData.textArgs)) or nil))
+                eventData.Triggrd.tts:speak(string.format(text,
+                    (eventData.textArgs and table.unpack(eventData.textArgs)) or nil))
             end
         end
     }
@@ -51,7 +52,12 @@ function Triggrd:start()
 
     Triggrd:registerAutomations(userAutomationsPath)
     Triggrd.tts = hs.speech.new()
-Triggrd:createMenubar()
+    Triggrd.generateAppListItem = assert(loadfile(hs.spoons.resourcePath('axobserver.lua')))
+    Triggrd.runningApps = {}
+    for _,app in ipairs(hs.application.runningApplications()) do
+        table.insert(Triggrd.runningApps, Triggrd.generateAppListItem(Triggrd, app))
+    end
+    Triggrd:createMenubar()
     loadfile(hs.spoons.resourcePath("events.lua"))(Triggrd)
     Triggrd:setupHotkeys()
     logger.i("Triggrd is ready")
@@ -72,7 +78,9 @@ function Triggrd:handleEvent(event)
     if event.data then
         event.data.Triggrd = Triggrd
     else
-        event.data = {Triggrd=Triggrd}
+        event.data = {
+            Triggrd = Triggrd
+        }
     end
     for i = 1, #automations do
         automations[i].actor(event.data)
@@ -133,7 +141,7 @@ function Triggrd:createMenubar()
         end
     }, {
         title = "Migrate SoundNote soundpack...",
-        fn=function()
+        fn = function()
             loadfile(hs.spoons.resourcePath("snmigrate.lua"))(userAutomationsPath)
         end
     }}
