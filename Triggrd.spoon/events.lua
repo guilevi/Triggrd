@@ -156,10 +156,14 @@ function updateAppList(eventType, app)
                 return
             end
         end
-        table.insert(Triggrd.runningApps, Triggrd.generateAppListItem(Triggrd,app))
+        table.insert(Triggrd.runningApps, Triggrd.generateAppListItem(Triggrd, app))
     elseif eventType == hs.application.watcher.terminated then
         Triggrd.runningApps = hs.fnutils.ifilter(Triggrd.runningApps, function(i)
-            return i[1] == app
+            -- Quick attempted fix, there is probably a cleaner way
+            if i[1] == app and i[3] ~= nil then
+                i[3]:stop()
+            end
+            return i[1] ~= app
         end)
     end
 end

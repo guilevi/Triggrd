@@ -52,7 +52,7 @@ function Triggrd:start()
 
     Triggrd:registerAutomations(userAutomationsPath)
     Triggrd.tts = hs.speech.new()
-    Triggrd.generateAppListItem = assert(loadfile(hs.spoons.resourcePath('axobserver.lua')))
+    Triggrd.generateAppListItem = loadfile(hs.spoons.resourcePath('axobserver.lua'))
     Triggrd.runningApps = {}
     for _,app in ipairs(hs.application.runningApplications()) do
         table.insert(Triggrd.runningApps, Triggrd.generateAppListItem(Triggrd, app))
