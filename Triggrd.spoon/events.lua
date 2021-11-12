@@ -139,6 +139,7 @@ local volumeEvents = {
 }
 
 Triggrd.volumeWatcher = hs.fs.volume.new(function(eventType, volumeInfo)
+if not volumeInfo.path:lower():find("timemachine") then
     Triggrd:handleEvent({
         tags = {"volume", volumeEvents[eventType]},
         data = {
@@ -146,6 +147,7 @@ Triggrd.volumeWatcher = hs.fs.volume.new(function(eventType, volumeInfo)
             textArgs = {volumeInfo.NSURLVolumeNameKey}
         }
     })
+end
 end)
 Triggrd.volumeWatcher:start()
 
