@@ -87,10 +87,14 @@ local powerSourceFilenames = {
     ["Battery Power"] = "onBattery",
     ["Off Line"] = "offline"
 }
-
+if (hs.battery.powerSource() ~= nil) then
 Triggrd.lastBatteryState = hs.battery.getAll()
+end
 
 Triggrd.batteryWatcher = hs.battery.watcher.new(function()
+    if (hs.battery.powerSource() == nil) then
+        return
+    end
     local batteryState = hs.battery.getAll()
     if batteryState.isCharging ~= Triggrd.lastBatteryState.isCharging then
         Triggrd:handleEvent({
