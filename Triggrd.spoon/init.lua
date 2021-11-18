@@ -57,7 +57,7 @@ function Triggrd:start()
 
     for _,app in ipairs(hs.application.runningApplications()) do
         -- Does the app have any windows? If not, we are adding a ton of unnecessary apps like voiceover, com.apple.speechsynthesis, etc.
-        if (#app.allWindows() > 0) then
+        if (#app:allWindows() > 0) then
             table.insert(Triggrd.runningApps, Triggrd.generateAppListItem(Triggrd, app))
         end
     end
