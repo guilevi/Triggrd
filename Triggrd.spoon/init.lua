@@ -54,8 +54,12 @@ function Triggrd:start()
     Triggrd.tts = hs.speech.new()
     Triggrd.generateAppListItem = loadfile(hs.spoons.resourcePath('axobserver.lua'))
     Triggrd.runningApps = {}
+
     for _,app in ipairs(hs.application.runningApplications()) do
-        table.insert(Triggrd.runningApps, Triggrd.generateAppListItem(Triggrd, app))
+        -- Does the app have any windows? If not, we are adding a ton of unnecessary apps like voiceover, com.apple.speechsynthesis, etc.
+        if (#app:allWindows() > 0) then
+            table.insert(Triggrd.runningApps, Triggrd.generateAppListItem(Triggrd, app))
+        end
     end
     Triggrd:createMenubar()
     loadfile(hs.spoons.resourcePath("events.lua"))(Triggrd)
