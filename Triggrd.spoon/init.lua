@@ -46,7 +46,7 @@ function Triggrd:start()
     -- Create the user automations directory (if it doesn't exist)
     local exists = hs.fs.attributes(userAutomationsPath)
     if not exists then
-        logger.i("Directory '" .. userAutomationsPath .. "' doesn't exist, creating...")
+        -- logger.i("Directory '" .. userAutomationsPath .. "' doesn't exist, creating...")
         hs.fs.mkdir(userAutomationsPath)
     end
 
@@ -60,7 +60,7 @@ function Triggrd:start()
     Triggrd:createMenubar()
     loadfile(hs.spoons.resourcePath("events.lua"))(Triggrd)
     Triggrd:setupHotkeys()
-    logger.i("Triggrd is ready")
+    -- logger.i("Triggrd is ready")
     Triggrd:handleEvent({
         tags = {"Triggrd", "started"}
     })
@@ -68,10 +68,10 @@ function Triggrd:start()
 end
 
 function Triggrd:handleEvent(event)
-    logger.i("Received event with tags " .. hs.inspect.inspect(event.tags))
+    -- logger.i("Received event with tags " .. hs.inspect.inspect(event.tags))
     local automations = Triggrd:automationsForTags(event.tags)
     if #automations == 0 then
-        logger.i("No automations for event " .. hs.inspect.inspect(event.tags))
+        -- logger.i("No automations for event " .. hs.inspect.inspect(event.tags))
         return
     end
 
@@ -122,7 +122,7 @@ function Triggrd:registerAutomations(path)
                 actor = Triggrd.automationHandlers[extension](fullPath)
             }
             table.insert(registeredAutomations, automation)
-            logger.i("Registered automation " .. fullPath)
+            -- logger.i("Registered automation " .. fullPath)
         end
     end
 end
