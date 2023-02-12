@@ -88,40 +88,46 @@ local powerSourceFilenames = {
     ["Off Line"] = "offline"
 }
 
-Triggrd.lastBatteryState = hs.battery.getAll()
-
-Triggrd.batteryWatcher = hs.battery.watcher.new(function()
-    local batteryState = hs.battery.getAll()
-    if batteryState.isCharging ~= Triggrd.lastBatteryState.isCharging then
-        Triggrd:handleEvent({
-            tags = {"battery", batteryState.isCharging and "charging" or "notCharging"},
-            data = {
-                batteryState = batteryState
-            }
-        })
-    end
-    if batteryState.percentage ~= Triggrd.lastBatteryState.percentage then
-        Triggrd:handleEvent({
-            tags = {"battery", "level", tostring(batteryState.percentage) .. "percent",
-                    (batteryState.percentage > Triggrd.lastBatteryState.percentage) and "up" or "down"},
-            data = {
-                batteryState = batteryState,
-                textArgs = {tostring(batteryState.percentage)}
-            }
-        })
-    end
-    if batteryState.powerSource ~= Triggrd.lastBatteryState.powerSource then
-        Triggrd:handleEvent({
-            tags = {"power", powerSourceFilenames[batteryState.powerSource]},
-            data = {
-                batteryState = batteryState,
-                textArgs = {tostring(batteryState.powerSource)}
-            }
-        })
-    end
-    Triggrd.lastBatteryState = batteryState
-end)
-Triggrd.batteryWatcher:start()
+-- Hammerspoon has a bug, hs.battery.getAll hangs for 3 to 4 minutes if no battery is present on the user's system
+if (hs.battery.powerSource() ~= nil) then
+    Triggrd.lastBatteryState = hs.battery.getAll()
+    
+    Triggrd.batteryWatcher = hs.battery.watcher.new(function()
+        if (hs.battery.powerSource() == nil) then
+            return
+        end
+        local batteryState = hs.battery.getAll()
+        if batteryState.isCharging ~= Triggrd.lastBatteryState.isCharging then
+            Triggrd:handleEvent({
+                tags = {"battery", batteryState.isCharging and "charging" or "notCharging"},
+                data = {
+                    batteryState = batteryState
+                }
+            })
+        end
+        if batteryState.percentage ~= Triggrd.lastBatteryState.percentage then
+            Triggrd:handleEvent({
+                tags = {"battery", "level", tostring(batteryState.percentage) .. "percent",
+                (batteryState.percentage > Triggrd.lastBatteryState.percentage) and "up" or "down"},
+                data = {
+                    batteryState = batteryState,
+                    textArgs = {tostring(batteryState.percentage)}
+                }
+            })
+        end
+        if batteryState.powerSource ~= Triggrd.lastBatteryState.powerSource then
+            Triggrd:handleEvent({
+                tags = {"power", powerSourceFilenames[batteryState.powerSource]},
+                data = {
+                    batteryState = batteryState,
+                    textArgs = {tostring(batteryState.powerSource)}
+                }
+            })
+        end
+        Triggrd.lastBatteryState = batteryState
+    end)
+    Triggrd.batteryWatcher:start()
+end
 
 Triggrd.screenWatcher = hs.screen.watcher.newWithActiveScreen(function()
     Triggrd:handleEvent({
