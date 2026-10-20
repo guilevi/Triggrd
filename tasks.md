@@ -15,14 +15,19 @@
 * Space changed event
 * Volume events
 * Migrate SoundNote soundpacks
+* Authentication prompts (sheets, dialogs and app Touch ID), with success and cancellation
+* Logout, restart and shutdown, including when an app stops them
+* Thunderbolt and USB4 devices
+* Display events
+* Audiodevice events (headphone jack, output switching, microphone in use)
+* Network events (Wi-Fi, Ethernet, internet)
+* Bluetooth (audio and input devices)
+* Camera in use, lid, heat and Low Power Mode
+* System Service: sounds at startup, login and logout
 
 ## To Do
 
 * Handle osascript files
 * Handle automator workflows
 * Receive events from hs.urlevent (maybe think about hs.httpserver because urlevent opens the HS console)
-* audiodevice events
-* Network events (requiring timer probably)
-* Wifi watcher events
 * All axuielement events (oh boy, will definitely require timer)
-* Find out if it's possible to react to bluetooth

@@ -42,10 +42,11 @@ observer:callback(function(observer, element, type, notificationInfo)
         }
     elseif type == hs.axuielement.observer.notifications.sheetCreated then
         tags = {'sheetcreated'}
-        -- This is absolutely horrible but I literally cannot think of another way of doing this
-if element:attributeValue('AXChildren')[3] and element:attributeValue('AXChildren')[3]:attributeValue('AXValue'):find("is trying to") then
-table.insert(tags, 'authentication')
-end
+        -- Authentication prompts used to be detected here by sniffing sheet text
+        -- for "is trying to". That missed most prompts (System Settings panes
+        -- show theirs from a separate extension process, and SecurityAgent
+        -- dialogs aren't sheets at all), so it's now done from the system log
+        -- in events.lua.
     end
     Triggrd:handleEvent({
         tags = tags,
